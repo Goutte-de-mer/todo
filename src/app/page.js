@@ -15,7 +15,6 @@ export default function Home() {
   }, []);
 
   const addTask = (newTask) => {
-    console.log("add");
     setTasks((prev) => [newTask, ...prev]);
   };
   const removeTask = (id) => {
