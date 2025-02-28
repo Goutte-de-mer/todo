@@ -42,14 +42,24 @@ const Task = ({ id, title, description, completed, removeTask }) => {
   };
 
   return (
-    <li className="flex w-full items-center">
-      <input
-        type="checkbox"
-        checked={isComplete}
-        onChange={() => handleCheckboxChange()}
-        className="mr-2.5 w-4 border-(--text)"
-      />
-      <span className={`${isComplete ? "isComplete" : ""}`}>{title}</span>
+    <li className="flex w-full items-start">
+      <div className="w-full">
+        <div className="flex w-full items-center">
+          <input
+            type="checkbox"
+            checked={isComplete}
+            onChange={() => handleCheckboxChange()}
+            className="mr-3 w-4 border-(--text)"
+          />
+          <p className={`${isComplete ? "isComplete" : ""} font-medium`}>
+            {title}
+          </p>
+        </div>
+
+        <p className={`${isComplete ? "isComplete" : ""} ml-7 text-[#7b7b7b]`}>
+          {description}
+        </p>
+      </div>
 
       <button className="ml-auto cursor-pointer p-1.5 text-xs transition-colors hover:text-(--secondary)">
         <FontAwesomeIcon

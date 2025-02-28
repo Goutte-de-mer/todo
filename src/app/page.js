@@ -40,7 +40,7 @@ export default function Home() {
       </div>
 
       <div className="m-auto mt-7 min-w-full grow rounded-xl bg-white px-7 py-5 sm:w-xl sm:min-w-0">
-        <ul className="h-full w-full overflow-y-auto">
+        <ul className="h-full w-full space-y-3 overflow-y-auto">
           {tasks.length < 1 ? "Aucune tâche" : tasksList}
         </ul>
       </div>
