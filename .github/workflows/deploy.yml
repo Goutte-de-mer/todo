@@ -20,5 +20,5 @@ jobs:
           inventory: |
             [webserver]
             13.60.168.45 ansible_user=ubuntu
-          inventory: ansible/inventory.ini
+          # inventory: ansible/inventory.ini
           options: "-u ubuntu"
