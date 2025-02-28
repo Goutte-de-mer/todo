@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --background: #e7c6ff;
+  --text: #515151;
+  --secondary: #b8c0ff;
+  --font-base: "Montserrat", sans-serif;
+  --font-title: "Bagel Fat One", sans-serif;
+}
+
+body {
+  color: var(--text);
+  background: var(--background);
+  font-family: var(--font-base);
+  height: 100vh;
+}
+
+.font-title {
+  font-family: var(--font-title);
+  @apply text-center text-6xl text-white;
+}
+
+.isComplete {
+  @apply text-slate-400 line-through;
+}
