@@ -19,5 +19,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           inventory: |
             [webserver]
-            13.60.168.45 ansible_user=ubuntu
+            217.182.193.31 ansible_user=ubuntu
           options: "-u ubuntu"
