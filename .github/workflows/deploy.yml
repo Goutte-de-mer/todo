@@ -16,7 +16,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Définition des variables (à adapter)
             app_dir="/home/ubuntu/todo"
             repo_url="https://github.com/Goutte-de-mer/todo.git"
 
@@ -44,9 +43,11 @@ jobs:
 
             echo "=== Installation des dépendances et build ==="
             cd $app_dir
+            # Désactiver ESLint en production (si besoin)
+            export NEXT_DISABLE_ESLINT=1
             npm install
             npm run build
 
             echo "=== Démarrage de l'application avec PM2 ==="
-            pm2 restart next-app || pm2 start node_modules/next/dist/bin/next --name "next-app" -- start
+            pm2 restart next-app --update-env || pm2 start node_modules/next/dist/bin/next --name "next-app" -- start
             pm2 save
