@@ -15,39 +15,55 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
           script: |
-            app_dir="/home/ubuntu/todo"
-            repo_url="https://github.com/Goutte-de-mer/todo.git"
 
             echo "=== Mise à jour du système ==="
-            sudo apt-get update && sudo apt-get upgrade -y
+            sudo apt update && sudo apt upgrade -y
 
             echo "=== Installation de Node.js et PM2 ==="
-            curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -
-            sudo apt-get install -y nodejs
-            sudo npm install -g pm2
+            if ! command -v node >/dev/null 2>&1; then
+              echo "Installation de Node.js..."
+              curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+              sudo apt install -y nodejs
+            else
+              echo "Node.js est déjà installé."
+            fi
+            if ! command -v pm2 >/dev/null 2>&1; then
+              echo "Installation de PM2..."
+              sudo npm install -g pm2
+            else
+              echo "PM2 est déjà installé."
+            fi
+
+            echo "=== Définir le dossier de déploiement du projet ==="
+            PROJECT_DIR="/home/ubuntu/todo"
 
             echo "=== Correction des permissions sur le dossier de l'application ==="
             sudo chown -R ubuntu:ubuntu $app_dir
 
             echo "=== Vérification de l'existence du dossier du projet ==="
-            if [ ! -d "${app_dir}/.git" ]; then
-              echo "Le dossier n'existe pas, clonage du projet..."
-              git clone $repo_url $app_dir --branch main --single-branch --force
+            if [ ! -d "$PROJECT_DIR" ]; then
+              echo "Clonage du projet dans $PROJECT_DIR..."
+              git clone https://github.com/Goutte-de-mer/todo.git $PROJECT_DIR
             else
-              echo "Le dossier existe, mise à jour du projet..."
-              cd $app_dir
-              git reset --hard
-              git pull origin main
+              echo "Mise à jour du projet dans $PROJECT_DIR..."
+              cd $PROJECT_DIR
+              git pull
             fi
 
             echo "=== Installation des dépendances et build ==="
-            cd $app_dir
-            # Désactiver ESLint en production (si besoin)
-            export NEXT_DISABLE_ESLINT=1
-            npm install
+            cd $PROJECT_DIR
+            echo "Installation des dépendances..."
+            npm install --legacy-peer-deps
+            echo "Build de l'application..."
             npm run build
 
             echo "=== Démarrage de l'application avec PM2 ==="
-            pm2 restart next-app --update-env || pm2 start node_modules/next/dist/bin/next --name "next-app" -- start
-            pm2 save
+            if pm2 list | grep -q next-app; then
+              echo "Redémarrage de l'application avec PM2..."
+              pm2 reload next-app
+            else
+              echo "Démarrage de l'application avec PM2..."
+              pm2 start npm --name "next-app" -- start
+            fi
