@@ -35,7 +35,7 @@ export default function Home() {
   return (
     <main className="flex h-full flex-col p-5">
       <div className="m-auto flex">
-        <h1 className="font-title">Todo list</h1>
+        <h1 className="font-title">To-do list</h1>
         <PlusButton addTask={addTask} />
       </div>
 
