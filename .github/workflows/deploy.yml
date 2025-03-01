@@ -9,15 +9,40 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Récupérer le code
-        uses: actions/checkout@v2
-
-      - name: Exécuter Ansible
-        uses: dawidd6/action-ansible-playbook@v2
+      - name: Déployer via SSH sur le serveur OVH
+        uses: appleboy/ssh-action@v0.1.8
         with:
-          playbook: ansible/playbook.yml
+          host: ${{ secrets.SERVER_HOST }}
+          username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          inventory: |
-            [webserver]
-            217.182.193.31 ansible_user=ubuntu
-          options: "-u ubuntu"
+          script: |
+            app_dir="/home/ubuntu/todo"
+            repo_url="https://github.com/Goutte-de-mer/todo.git"
+
+            echo "=== Mise à jour du système ==="
+            sudo apt-get update && sudo apt-get upgrade -y
+
+            echo "=== Installation de Node.js et PM2 ==="
+            curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -
+            sudo apt-get install -y nodejs
+            sudo npm install -g pm2
+
+            echo "=== Vérification de l'existence du dossier du projet ==="
+            if [ ! -d "${app_dir}/.git" ]; then
+              echo "Le dossier n'existe pas, clonage du projet..."
+              git clone $repo_url $app_dir --branch main --single-branch --force
+            else
+              echo "Le dossier existe, mise à jour du projet..."
+              cd $app_dir
+              git reset --hard
+              git pull origin main
+            fi
+
+            echo "=== Installation des dépendances et build ==="
+            cd $app_dir
+            npm install
+            npm run build
+
+            echo "=== Démarrage de l'application avec PM2 ==="
+            pm2 restart next-app || pm2 start node_modules/next/dist/bin/next --name "next-app" -- start
+            pm2 save

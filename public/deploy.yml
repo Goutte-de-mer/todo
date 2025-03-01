@@ -1,0 +1,23 @@
+name: Deploy Next.js App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v2
+
+      - name: Exécuter Ansible
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: ansible/playbook.yml
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          inventory: |
+            [webserver]
+            217.182.193.31 ansible_user=ubuntu
+          options: "-u ubuntu"
