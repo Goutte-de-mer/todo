@@ -56,7 +56,9 @@ const Task = ({ id, title, description, completed, removeTask }) => {
           </p>
         </div>
 
-        <p className={`${isComplete ? "isComplete" : ""} ml-7 text-[#7b7b7b]`}>
+        <p
+          className={`${isComplete ? "isComplete" : ""} ml-7 whitespace-pre-line text-[#7b7b7b]`}
+        >
           {description}
         </p>
       </div>
