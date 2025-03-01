@@ -51,6 +51,9 @@ jobs:
               git pull
             fi
 
+            echo "=== Nettoyage de l'ancien build ==="
+            rm -rf $PROJECT_DIR/.next
+
             echo "=== Installation des dépendances et build ==="
             cd $PROJECT_DIR
             echo "Installation des dépendances..."
@@ -60,9 +63,10 @@ jobs:
 
             echo "=== Démarrage de l'application avec PM2 ==="
             if pm2 list | grep -q next-app; then
-              echo "Redémarrage de l'application avec PM2..."
-              pm2 reload next-app
+              echo "Redémarrage complet de l'application avec PM2..."
+              pm2 restart next-app --update-env
             else
               echo "Démarrage de l'application avec PM2..."
               pm2 start npm --name "next-app" -- start
             fi
+            pm2 save
