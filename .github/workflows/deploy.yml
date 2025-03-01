@@ -9,64 +9,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Déployer via SSH sur le serveur OVH
-        uses: appleboy/ssh-action@v0.1.8
+      - name: Récupérer le code
+        uses: actions/checkout@v3
+
+      - name: Déployer sur le serveur OVH via SSH
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
           script: |
-            echo "=== Mise à jour du système ==="
-            sudo apt update && sudo apt upgrade -y
-
-            echo "=== Installation de Node.js et PM2 ==="
-            if ! command -v node >/dev/null 2>&1; then
-              echo "Installation de Node.js..."
-              curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-              sudo apt install -y nodejs
-            else
-              echo "Node.js est déjà installé."
-            fi
-            if ! command -v pm2 >/dev/null 2>&1; then
-              echo "Installation de PM2..."
-              sudo npm install -g pm2
-            else
-              echo "PM2 est déjà installé."
-            fi
-
-            echo "=== Définir le dossier de déploiement du projet ==="
-            PROJECT_DIR="/home/ubuntu/todo"
-
-            echo "=== Correction des permissions sur le dossier de l'application ==="
-            sudo chown -R ubuntu:ubuntu $PROJECT_DIR
-
-            echo "=== Vérification de l'existence du dossier du projet ==="
-            if [ ! -d "$PROJECT_DIR" ]; then
-              echo "Clonage du projet dans $PROJECT_DIR..."
-              git clone https://github.com/Goutte-de-mer/todo.git $PROJECT_DIR
-            else
-              echo "Mise à jour du projet dans $PROJECT_DIR..."
-              cd $PROJECT_DIR
-              git pull
-            fi
-
-            echo "=== Nettoyage de l'ancien build ==="
-            rm -rf $PROJECT_DIR/.next
-
-            echo "=== Installation des dépendances et build ==="
-            cd $PROJECT_DIR
-            echo "Installation des dépendances..."
-            npm install --legacy-peer-deps
-            echo "Build de l'application..."
+            cd /home/ubuntu/todo
+            git pull origin main
+            npm install
             npm run build
-
-            echo "=== Démarrage de l'application avec PM2 ==="
-            if pm2 list | grep -q next-app; then
-              echo "Redémarrage complet de l'application avec PM2..."
-              pm2 restart next-app --update-env
-            else
-              echo "Démarrage de l'application avec PM2..."
-              pm2 start npm --name "next-app" -- start
-            fi
-            pm2 save
+            pm2 restart all
