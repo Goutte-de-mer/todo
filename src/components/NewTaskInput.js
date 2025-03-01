@@ -15,7 +15,7 @@ const NewTaskInput = ({ handleAddTask }) => {
       />
       <input
         className="w-full border-b-[1.5px] border-b-[#e4e4e4] focus-visible:outline-0"
-        type="text"
+        type="textarea"
         placeholder="Description..."
         value={description}
         onChange={(e) => setDescription(e.target.value)}
