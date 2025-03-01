@@ -17,7 +17,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-
             echo "=== Mise à jour du système ==="
             sudo apt update && sudo apt upgrade -y
 
@@ -40,7 +39,7 @@ jobs:
             PROJECT_DIR="/home/ubuntu/todo"
 
             echo "=== Correction des permissions sur le dossier de l'application ==="
-            sudo chown -R ubuntu:ubuntu $app_dir
+            sudo chown -R ubuntu:ubuntu $PROJECT_DIR
 
             echo "=== Vérification de l'existence du dossier du projet ==="
             if [ ! -d "$PROJECT_DIR" ]; then
