@@ -8,39 +8,45 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Récupérer le code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Ajouter la clé SSH privée et configurer SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 217.182.193.31 >> ~/.ssh/known_hosts
+      - name: Déploiement sur le serveur
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: 217.182.193.31
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "Mise à jour du système..."
+            sudo apt-get update && sudo apt-get upgrade -y
 
-      - name: Vérifier la connexion SSH
-        run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@217.182.193.31 "echo 'Connexion SSH réussie'"
+            echo "Installation de Node.js et PM2..."
+            if ! command -v node > /dev/null 2>&1; then
+              curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+              sudo npm install -g pm2
+            fi
 
-      - name: Corriger les permissions du dépôt
-        run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@217.182.193.31 << 'EOF'
-          sudo chown -R ubuntu:ubuntu /home/ubuntu/todo
-          sudo chmod -R 755 /home/ubuntu/todo
-          EOF
+            echo "Déploiement de l'application..."
+            if [ ! -d "/home/ubuntu/todo/.git" ]; then
+              git clone https://github.com/Goutte-de-mer/todo.git /home/ubuntu/todo
+            else
+              cd /home/ubuntu/todo
+              git reset --hard
+              git pull origin main
+            fi
 
-      - name: Déployer sur le serveur
-        run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@217.182.193.31 << 'EOF'
-          cd /home/ubuntu/todo || git clone https://github.com/Goutte-de-mer/todo.git /home/ubuntu/todo && cd /home/ubuntu/todo
-          git fetch origin main
-          git reset --hard origin/main
-          yarn install
-          sudo chown -R ubuntu:ubuntu /home/ubuntu/todo/.next
-          sudo chmod -R 755 /home/ubuntu/todo/.next
-          yarn build
-          pm2 delete next-app || true
-          pm2 start yarn --name "next-app" -- start
-          pm2 save
-          EOF
+            cd /home/ubuntu/todo
+            npm install
+            npm run build
+
+            echo "Démarrage / redémarrage de l'application avec PM2..."
+            if pm2 describe next-app > /dev/null; then
+              pm2 restart next-app
+            else
+              pm2 start node_modules/next/dist/bin/next --name "next-app" -- start
+            fi
+
+            pm2 save
