@@ -21,7 +21,10 @@ jobs:
       #     ssh-keyscan -H 217.182.193.31 >> ~/.ssh/known_hosts  # Remplace par ton IP
 
       - name: Vérifier la connexion SSH
-        run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@217.182.193.31 "echo 'Connexion SSH réussie'"
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
       - name: Corriger les permissions du dépôt
         run: |
