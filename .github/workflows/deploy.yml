@@ -13,12 +13,12 @@ jobs:
       - name: Récupérer le code
         uses: actions/checkout@v3
 
-      # - name: Ajouter la clé SSH privée et configurer SSH
-      #   run: |
-      #     mkdir -p ~/.ssh
-      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-      #     chmod 600 ~/.ssh/id_rsa
-      #     ssh-keyscan -H 217.182.193.31 >> ~/.ssh/known_hosts  # Remplace par ton IP
+      - name: Ajouter la clé SSH privée et configurer SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 217.182.193.31 >> ~/.ssh/known_hosts
 
       - name: Vérifier la connexion SSH
         run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@217.182.193.31 "echo 'Connexion SSH réussie'"
