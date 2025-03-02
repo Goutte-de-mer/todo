@@ -43,10 +43,10 @@ jobs:
             npm run build
 
             echo "Démarrage / redémarrage de l'application avec PM2..."
-            if pm2 describe next-app > /dev/null; then
-              pm2 restart next-app
+            if sudo pm2 describe next-app > /dev/null; then
+              sudo pm2 restart next-app
             else
-              pm2 start node_modules/next/dist/bin/next --name "next-app" -- start
+              sudo pm2 start node_modules/next/dist/bin/next --name "next-app" -- start
             fi
 
-            pm2 save
+            sudo pm2 save
