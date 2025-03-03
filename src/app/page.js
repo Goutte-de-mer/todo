@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, React } from "react";
 import Task from "@/components/Task";
 import PlusButton from "@/components/PlusButton";
 export default function Home() {

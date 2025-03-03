@@ -9,6 +9,7 @@ const NewTaskInput = ({ handleAddTask }) => {
       <input
         className="w-full border-b-[1.5px] border-b-[#e4e4e4] focus-visible:outline-0"
         type="text"
+        name="task"
         placeholder="Titre"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -24,6 +25,7 @@ const NewTaskInput = ({ handleAddTask }) => {
       />
 
       <button
+        type="submit"
         className="mx-auto cursor-pointer rounded-md bg-(--secondary) px-4 py-3 font-semibold text-white transition hover:scale-90"
         onClick={() => handleAddTask(title, description)}
       >

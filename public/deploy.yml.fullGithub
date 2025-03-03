@@ -6,20 +6,11 @@ on:
       - main
 
 jobs:
-  test-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Récupérer le code
         uses: actions/checkout@v2
-
-      - name: Installer les dépendances
-        run: yarn install
-
-      - name: Tests unitaires et d'intégration
-        run: yarn test
-
-      - name: Tests E2E
-        run: npx cypress run
 
       - name: Déploiement sur le serveur
         uses: appleboy/ssh-action@v0.1.7

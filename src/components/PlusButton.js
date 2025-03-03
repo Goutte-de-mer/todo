@@ -9,6 +9,7 @@ const PlusButton = ({ addTask }) => {
   return (
     <>
       <button
+        id="open-form"
         className="mt-auto ml-5 h-7 w-7 cursor-pointer rounded-full bg-white transition-colors hover:text-(--secondary)"
         onClick={() => setShowModal(true)}
       >
